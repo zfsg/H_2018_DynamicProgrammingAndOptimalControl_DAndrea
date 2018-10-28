@@ -1,0 +1,504 @@
+
+\documentclass[10pt,a4paper]{scrartcl}
+
+\usepackage[english]{babel}
+
+\input{../Headerfiles/Packages}
+\input{../Headerfiles/Titles}
+\input{../Headerfiles/Commands}
+\graphicspath{{Pictures/}}
+\parindent 0pt
+
+\title{Dynamic Programming And Optimal Control}
+\author{GianAndrea Müller}
+
+\newtheorem{define}{Definition}
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+\begin{multicols*}{4}
+\maketitle
+\tableofcontents
+\end{multicols*}
+
+\begin{multicols*}{2}
+\section{Random Variables}
+
+\subsection{Discrete Random Variables (DRV)}
+
+\begin{TDefinitionTable*}
+$\mathcal{X}$&set of all possible outcomes\\
+$p_x(\cdot)$&probability density function (PDF)\\
+\end{TDefinitionTable*}
+
+\begin{enumerate}
+\item $p_x(\bar{x})\geq 0\ \forall\bar{x}\in\mathcal{X}$
+\item $\sum\limits_{\bar{x}\in\mathcal{X}}p_x(\bar{x})=1$
+\end{enumerate}
+
+\begin{define}
+$p_x(\cdot)$ and $\mathcal{X}$ define a \textbf{discrete random variables} (DRV) $x$.
+\end{define}
+
+The probability that a random variable $x$ is equal to some value $\bar{x}\in\mathcal{X}$ is $p_x(\bar{x})$. This is written as $Pr(x=\bar{x})=p_x(\bar{x})$.
+
+\begin{define}
+The \textbf{joint PDF} $p_{xy}(\cdot,\cdot)$ is a real valued function that satisfies:
+
+\begin{enumerate}
+\item $p_{xy}(\bar{x},\bar{y})\geq 0\ \forall\bar{x}\in\mathcal{X},\ \forall y\in\mathcal{Y}$,
+\item $\sum\limits_{\bar{x}\in\mathcal{X}}\sum\limits_{y\in\mathcal{Y}}p_{xy}(\bar{x},\bar{y})=1$.
+\end{enumerate}
+\end{define}
+
+\begin{define}
+\textbf{Marginalization} or \textbf{Sum Rule} axiom:
+
+Given $p_{xy}(\cdot,\cdot)$ define $p_x(\bar{x}):=\sum\limits_{\bar{y}\in\mathcal{Y}}p_{xy}(\bar{x},\bar{y})$.
+\end{define}
+
+\begin{define}
+\textbf{Conditioning} or \textbf{Product Rule} axiom:
+
+Given $p_{xy}(\cdot,\cdot)$ the PDF of $y$ is $p_{x|y}(\bar{x}|\bar{y}):=\frac{p_{xy}(\bar{x},\bar{y})}{p_y(\bar{y})}$ when $p_y(\bar{y})\neq 0$.
+\end{define}
+
+\begin{itemize}
+\item Sum rule applied to a conditional PDF:
+
+Given $p_{xy|z}(\bar{x},\bar{y}|\bar{z}),p_{x|z}(\bar{x}|\bar{z}:=\sum\limits_{\bar{y}\in\mathcal{Y}}p_{xy|z}(\bar{x},\bar{y}|\bar{z})$.
+\item Short form: $p(x|y)$
+\item Product rule usually written as: $p(x,y) = p(x|y)p(y) =p(y|x)p(x)$
+\end{itemize}
+
+\begin{define}
+\textbf{Total Probability Theorem:}
+
+\mportant{$p_x(\bar{x})=\sum\limits_{\bar{y}\in\mathcal{Y}}p_{x|y}(\bar{x}|\bar{y})p_y(\bar{y})$}.
+\end{define}
+
+\subsubsection{Generalization for multiple variables}
+
+\begin{define}
+\textbf{Marginalization}
+
+\important{$p_x(\bar{x})=\sum\limits_{\bar{y}\in\mathcal{Y}}p_{xy}(\bar{x},\bar{y})$}
+
+as a short form of:
+
+\mportant{$p_{x_1,\ldots,x_N}(\bar{x}_1,\ldots,\bar{x}_N)=\sum\limits_{(\bar{y}_1,\ldots,\bar{y}_L)\in\mathcal{Y}}p_{x_1,\ldots,x_N}(\bar{x}_1,\ldots,\bar{x}_N,\bar{y}_1,\ldots,\bar{y}_L)$.}
+\end{define}
+
+\begin{define}
+\textbf{Conditioning}
+
+\important{$p(x,y) = p(x|y)p(y)$}
+
+as a short form of:
+
+\mportant{$p(x_1,\ldots,x_N,y_1,\ldots,y_L)=p(x_1,\ldots,x_N|y_1,\ldots,y_L)p(y_1,\ldots,y_L)$}
+\end{define}
+
+\begin{define}
+Random variables $x$ and $y$ are said to be \textbf{independent} if $p(x|y)=p(x)$. Equivalently: $p(x,y)=p(x)p(y)$.
+\end{define}
+
+\begin{define}
+Random variables are said to be \textbf{conditionally independent} if: $p(x|y,z)=p(x|z)$. Knowledge of $z$ makes $x$ and $y$ independent.
+\end{define}
+
+\subsection{Continuous Random Variables (CRV)}
+
+\begin{TDefinitionTable*}
+$\mathcal{X}$&subset of the real line\\
+$p(\cdot)$&PDF
+\end{TDefinitionTable*}
+
+\begin{enumerate}
+\item $p_x(\bar{x})\geq 0\ \forall\bar{x}\in\mathcal{X}$
+\item $\int_{\mathcal{X}}p_x(\bar{x})d\bar{x}=1$
+\end{enumerate}
+
+\begin{define}
+The \textbf{probability of being in an interval} is:
+
+\mportant{$Pr(x\in[a,b]):=\int_a^bp_x(\bar{x})d\bar{x}$}
+\end{define}
+
+\subsection{Expectation}
+
+\begin{define}
+The \textbf{expected value} of a random variable is defined as:
+
+\mportant{$\underset{x}{E}[x]:=\sum\limits_{\bar{x}\in\mathcal{X}}\bar{x}p_x(\bar{x})$}
+\end{define}
+
+\begin{itemize}
+\item $\underset{x}{E}[ax+b]=a\underset{x}{E}[x]+b$ where $a,b$ constant
+\item $\underset{x}{E}[g(x)]=\sum\limits_{\bar{x}\in\mathcal{X}}\bar{x}p_{x|y}(\bar{x}|\bar{y})$.
+\item For conditional PDF's:
+\end{itemize}
+
+\mportant{$\underset{x|y}{E}[x|y=\bar{y}]:=\sum\limits_{\bar{x}\in\mathcal{X}}\bar{x}p_{x|y}(\bar{x}|\bar{y})$}
+
+\subsubsection{Multi-variable generalizations}
+
+If $x$ is a vector:
+
+\mportant{$\underset{x}{E}[x]=\sum\limits_{\bar{x}\in\mathcal{X}}\bar{x}p_x(\bar{x})=\sum\limits_{\bar{x_1}\in\mathcal{X}}\cdots\sum\limits_{\bar{x}_N\in\mathcal{X}}[\bar{x}_1,\ldots,\bar{x}_N]^Tp_{(x_1,\ldots,x_N)}(\bar{x}_1,\ldots,\bar{x}_N]$}
+
+Given $g(x):\mathbb{R}^N\rightarrow \mathbb{R}$ and DRV $x$
+
+\mportant{$\underset{x}{E}[g(x)]=\sum\limits_{\bar{x}\in\mathcal{X}}g(\bar{x})p_x(\bar{x})=\sum\limits_{\bar{x}_1\in\mathcal{X}}\cdots\sum\limits_{\bar{x}_N\in\mathcal{X}}g(\bar{x}_1,\ldots,\bar{x}_N)p_{(x_1,\ldots,x_N)}(\bar{x}_1,\ldots,\bar{x}_N)$}
+
+If the two random variables are \textbf{independent}, then:
+
+\mportant{$\underset{xy}{E}[g(x,y)]=\sum\limits_{\bar{y}\in\mathcal{Y}}\sum\limits_{\bar{X}\in\mathcal{X}}g(\bar{x},\bar{y})p_{xy}(\bar{x},\bar{y})=\sum\limits_{\bar{y}\in\mathcal{Y}}\sum\limits_{\bar{x}\in\mathcal{X}}g(\bar{x},\bar{y})p_{xy}(\bar{x},\bar{y})=\sum\limits_{\bar{y}\in\mathcal{Y}}\sum\limits_{\bar{x}\in\mathcal{X}}g(\bar{x},\bar{y})p_x(\bar{x})p_y(\bar{y})=\underset{y}{E}[\underset{x}{E}[g(x,y)]]$}
+
+\textbf{Mean and Variance}:
+
+\begin{define}
+$\underset{x}{E}[x]$ is called the \textbf{mean}, generally a vector.
+\end{define}
+
+\begin{define}
+$\underset{x}{\text{Var}}[x]:=\underset{x}{E}\left[\left(x-\underset{x}{E}[x]\right)\left(x-\underset{x}{E}[x]\right)^T\right]$ is called the \textbf{variance}, generally a matrix.
+\end{define}
+
+\textbf{Linerarity:}
+
+\mportant{$\underset{xy}{E}[x+y]=\sum\limits_{\bar{y}\in\mathcal{Y}}\sum\limits_{\bar{x}\in\mathcal{X}}(\bar{x}+\bar{y})p_{xy}(\bar{x},\bar{y})=\sum\limits_{x\in\mathcal{x}}\bar{x}\sum\limits_{\bar{y}\in\mathcal{Y}}p_{xy}(\bar{x},\bar{y})+\sum\limits_{\bar{y}\in\mathcal{Y}}\bar{y}\sum\limits_{\bar{x}\in\mathcal{X}}p_{xy}(\bar{x},\bar{y})=\underset{x}{E}[x]+\underset{y}{E}[y]$}
+
+\textbf{Law of Total Expectation:}
+
+\mportant{$\underset{y}{E}[\underset{x|y}{E}[x]]=\sum\limits_{\bar{y}\in\mathcal{Y}}p_y(\bar{y})\left(\sum\limits_{\bar{x}\in\mathcal{X}}\bar{x}p_{x|y}(\bar{x}|\bar{y})\right)=\sum\limits_{\bar{x}\in\mathcal{X}}\bar{x}\sum\limits_{\bar{y}\in\mathcal{Y}}p_{x|y}(\bar{x}|\bar{y})p_y(\bar{y})=\sum\limits_{\bar{x}\in\mathcal{X}}\bar{x}p_x(\bar{x})=\underset{x}{E}[x]$}
+
+\section{Basics}
+
+\myspic{0.7}{Dynamics}
+
+\mportant{$x_{k+1}=f_k(x_k,u_k,w_k),\ k=0,1,\ldots,N-1$}
+
+\begin{TDefinitionTable*}
+$k$&discrete time index&\\
+$N$&given time horizon&\\
+$x_k\in \mathcal{S}_k$&system state vector at time $k$&\\
+$u_k\in\mathcal{U}_k(x_k)$&control input vector at time $k$&\\
+$\omega_k$&disturbance vector at time $k$&\\
+$f_k(\cdot,\cdot,\cdot)$&function capturing system evolution at time $k$
+\end{TDefinitionTable*}
+
+\begin{itemize}
+\item It is assumed that the conditional probability of $w_k$ depending on $u_k$ and $x_k$ is known and $w_k$ is independent of any other variables.
+\end{itemize}
+
+\subsection{Cost Function}
+
+\important{$\underbrace{g_N(x_N)}_{\text{terminal cost}}+\underbrace{\sum\limits_{k=0}^{N-1}\underbrace{g_k(x_k,u_k,w_k)}_{\text{stage cost}}}_{\text{accumulated cost}}$}
+
+\begin{itemize}
+\item Cost is a random variable.
+\end{itemize}
+
+\subsubsection{Expected Cost}
+
+\begin{TDefinitionTable*}
+$X_1:=(x_1,\ldots,x_N)$&set of all states&\\
+$U_0:=(u_0,\ldots,u_{N-1}$&set of all inputs&\\
+$W_0:=(w_0,\ldots,w_{N-1}$&set of disturbances&\\
+\end{TDefinitionTable*}
+
+\important{$\underset{(X_1,U_0,W_0|x_0)}{E}\left[g_N(x_N)+\sum\limits_{k=0}^{N-1}g_k(x_k,u_k,w_k)\right]$}
+
+\begin{itemize}
+\item All variables $x_k,u_k,w_k$ are in general all random variables, since at least the disturbance is random, and thus coupled by the dynamics and possibly a control law depending on the state, all variables are coupled in general.
+\end{itemize}
+
+\subsection{Open Loop Control}
+
+\begin{TDefinitionTable*}
+$\bar{U}_0:=(\bar{u}_0,\ldots,\bar{u}_{N-1})$&fixed set of control inputs&\\
+\end{TDefinitionTable*}
+
+\mportname{Open Loop Cost}{$g_N(x_N)+\sum\limits_{k=0}^{N-1}g_k(x_k,\bar{u}_k,w_k)$}
+
+\importname{Expected Open Loop Cost}{$\underset{(X_1,W_0|x_0)}{E}\left[g_N(x_N)+\sum\limits_{k=}^{N-1}g_k(x_k,\bar{u}_k,w_k)\right]$}
+
+\begin{itemize}
+\item The bar emphasizes that the control inputs are fixed.
+\item Open loop control means that the control law is defined and fixed at time zero. The measurements of the state are not used to adapt the control law.
+\end{itemize}
+
+\subsection{Closed Loop Control}
+
+\begin{TDefinitionTable*}
+$u_k=\mu_k(x),\ u_k\in\mathcal{U}_k(x),\ \forall x\in\mathcal{S}_k,\ k=0,\ldots,N-1$&control law&\\
+\end{TDefinitionTable*}
+
+\importname{Admissible Policy}{$\pi:=(\mu_0(\cdot),\mu_1(\cdot),\ldots,\mu_{N-1}(\cdot))$}
+
+\mportname{Closed Loop Cost}{$g_N(x_N)+\sum\limits_{k=0}^{N-1}g_k(x_k,\mu_k(x_k),w_k)$}
+
+\importname{Expected Closed Loop Cost}{$J_\pi(x):=\underset{(X_1,W_0|x_0=x)}{E}\left[g_N(x_N)+\sum\limits_{k=0}^{N-1}g_k(x_k,\mu_k(x_k),w_k)\right]$}
+
+\begin{TDefinitionTable*}
+$\Pi$&set of all admissible policies&\\
+\end{TDefinitionTable*}
+
+$\pi^\ast$ is called the optimal policy if
+
+\mportant{$J_{\pi^\ast}(x)\leq J_{\pi}(x)\quad\forall\pi\ \in\ \pi,\ \forall x\ \in\ \mathcal{S}_0$}
+
+\subsection{Discrete State and Finite State Problems}
+
+\begin{TDefinitionTable*}
+$P_{ij}(u,k):=p_{x_{k+1}|x_k,u_k}(j|i,u)=Pr(x_{k+1}=j|x_k=i,u_k=u)$&transition probability&\\
+\end{TDefinitionTable*}
+
+\begin{itemize}
+\item $p_{x_{k+1}|x_k,u_k}(\cdot|\cdot,\cdot)$ denotes the PDF of $x_{k+1}$ given $x_k$ and $u_k$.
+\end{itemize}
+
+\section{The Dynamic Programming Algorithm}
+
+\subsection{The standard problem formulation}
+
+\mportant{$x_{k+1}=f_k(x_k,u_k,w_k),\quad k=0,1,2,\ldots,N-1$}
+
+where $x_k\in\mathcal{S}_k,\ u_k\in\mathcal{U}_k$ and $w_k\sim p_{w_k|x_k,u_k}$
+
+The control inputs are generated by the admissible policy $\pi\in\Pi$
+
+\mportant{$\pi=(\mu_0(\cdot),\mu_1(\cdot),\ldots,\mu_{N-1}(\cdot))$}
+
+The expected closed loop cost, given $x\in\mathcal{S}_0$, associated with policy $\pi$ is:
+
+\mportant{$J_\pi(x)=\underset{(X_1,W_0|x_0=x)}{E}\left[g_N(x_N)+\sum\limits_{k=0}^{N-1}g_k(x_k,\mu_k(x_k),w_k)\right]$}
+
+Now the objective is to construct $\pi^\ast$, an optimal policy such that
+
+\mportant{$\pi^\ast=\underset{\pi\in\Pi}{\text{arg min}}J_\pi(x)$.}
+
+$\pi^\ast$ is not a function of the state, thus $\pi^\ast$ has to work for all possible $x$.
+
+\subsection{Principle of Optimality}
+
+Let $\pi^\ast=(\mu_0^\ast(\cdot),\mu_1^\ast(\cdot),\ldots,\mu_{N-1}^\ast(\cdot))$ be an optimal policy.
+
+\mportant{$\underset{(X_{i+1},W_i|x_i=x)}{E}\left[g_N(x_N)+\sum\limits_{k=i}^{N-1}g_k(x_k,\mu_k(x_k),w_k)\right]$}
+
+where $X_{i+1}:=(x_{i+1},\ldots,x_N)$ and $W_i:=(w_i,\ldots,w_{N-1})$. Then the \textbf{truncated} policy $(\mu_i^\ast(\cdot),\mu_{i+1}^\ast(\cdot),\ldots,\mu_{N-1}^\ast(\cdot))$ is optimal for this problem.
+
+\subsection{DPA}
+
+\begin{theorem}
+For any initial state $x\in\mathcal{S}_0$, the optimal cost $J^\ast(x)$ is equal to $J_0(x)$ given the following recursive algorithm:
+
+\textbf{Initialization}
+
+\mportant{$J_N(x)=g_N(x),\quad \forall x\in\mathcal{S}_N$}
+
+\textbf{Recursion}
+
+\mportant{$J_k(x):=\min\limits_{u\in\mathcal{U}_k(x)}\underset{(w_k|x_k=x,u_k=u)}{E}\left[g_k(x_k,u_k,w_k)+J_{k+1}(f_k(x_k,u_k,w_k))\right]$}
+
+furthermore, if for each $k$ and $x\in\mathcal{S}_k,\ u^\ast=:\mu_k^\ast(x)$ minimizes the recursion equation, the policy $\pi^\ast=(\mu_0^\ast(\cdot),\mu_1^\ast(\cdot),\ldots,\mu_{N-1}^\ast(\cdot))$ is optimal.
+\end{theorem}
+
+\subsection{Converting non-standard Problems to the Standard Form}
+
+\subsubsection{Time Lags}
+
+Assume the dynamics have the following form:
+
+\mportant{$x_{k+1}=f_k(x_k,x_{k-1},u_k,u_{k-1},w_k)$}
+
+\begin{itemize}
+\item Let $y_k:=x_{k-1},\ s_k:=u_{k-1}$ and the augmented state vector $\tilde{x}_k:=(x_k,y_k,s_k)$.
+\item The dynamics of the augmented state then become
+
+\mportant{$\tilde{x}_{k+}=\begin{bmatrix}
+x_{k+1}\\y_{k+1}\\s_{k+1}
+\end{bmatrix}=\begin{bmatrix}
+f_k(x_k,y_k,u_k,s_k,w_k)\\x_k\\u_k
+\end{bmatrix}=:\tilde{f}_k(\tilde{x}_k,u_k,\omega_k)$}
+\end{itemize}
+
+\subsubsection{Correlated Disturbances}
+
+If the disturbance is correlated across time (colored noise) it can be modelled as follows:
+
+\begin{align*}
+w_k&=C_ky_{k+1}\\
+y_{k+1}&=A_ky_k+\xi_k
+\end{align*}
+
+where $A_k,C_k$ are given and $\xi_k,\ k=0,\ldots,N-1$ are independent random variables.
+
+\begin{itemize}
+\item Let the augmented state vector $\tilde{x}_k:=(x_k,y_k)$. Note that now $y_k$ must be observed at time $k$, which can be done using a state estimator.
+\item $y_k$ is an internal state of the filter that generates the noise realization $w_k$
+\item The dynamics of the augmented sate vector then become:
+
+\mportant{$\tilde{x}_{k+1}=\begin{bmatrix}
+x_{k+1}\\y_{k+1}
+\end{bmatrix}=
+\begin{bmatrix}
+f_k(x_k,u_k,C_k(A_ky_k+\xi_k))\\A_ky_k+\xi_k
+\end{bmatrix}
+=:\tilde{f}_k(\tilde{x}_k,u_k,\xi_k)$}
+
+\item When augmenting the state, the cost function becomes increasingly complex $\rightarrow$ \textbf{curse of dimensionality}!
+\end{itemize}
+
+\subsubsection{Forecasts}
+
+Each time period has its own forecast that reveals the probability distribution of $w_k$ and possibly of future disturbances.
+
+At the beginning of each period $k$, we receive a prediction $y_k$ that $w_k$ will attain a probability distribution out of a given finite collection of distributions $\{p_{w_k|y_k}(\cdot|1),p_{w_k|y_k}(\cdot|2),\ldots,p_{w_k|y_k}(\cdot|m)\}$. In particular, we receive a forecast that $y_k=i$ and thus $p_{w_k|x_k}(\cdot,|i)$ is used to generate $w_k$. Furthermore the forecast itself has a given a priori probability distribution, namely
+
+\mportant{$y_{k+1}=\xi_k$}
+
+where $\xi_k$ are independent random variables taking value $i\in\{1,2,\ldots,m\}$ with probability $p_{\xi_k}(i)$.
+
+\begin{itemize}
+\item Let the augmented state vector $\tilde{x}_k=(x_k,y_k)$. Since the forecast $y_k$ is known at time $k$ we still have perfect information.
+\item We defined our new disturbance as $\tilde{w}_k:=(w_k,\xi_k)$ with the distribution
+
+\begin{align*}
+p(\tilde{w}_k|\tilde{x}_k,u_k)&=p(w_k,\xi_k|x_k,y_k,u_k)\\
+&=p(w_k|x_k,y_k,u_k,\xi_k)p(\xi_k|x_k,y_k,u_k)\\
+&=p(w_k|x_k)p(\xi_k)
+\end{align*}
+\item The dynamics become
+
+\mportant{$\tilde{x}_{k+1}=\begin{bmatrix}
+x_{k+1}\\y_{k+1}
+\end{bmatrix}=\begin{bmatrix}
+f_k(x_k,u_k,w_k)\\\xi_k
+\end{bmatrix}=:\tilde{f}_k(\tilde{x}_k,u_k,\tilde{w}_k)$}
+\item The DPA becomes:
+
+\textbf{Initialization}
+
+\mportant{$J_N(\tilde{x})=J_N(x,y)=g_N(x),\quad x\in S_N,y\in\{1,\ldots,m\}$}
+
+\textbf{Recursion}
+
+\important{$\begin{matrix}J_k(\tilde{x})=J_k(x,y)=\underset{u\in\mathcal{U}_k(x_k)}{\min}\underset{(w_k|y_k=y)}{E}\left[g_k(x,u,w_k)+\sum\limits_{i=1}^mp_{\xi_k}(i)J_{k+1}(f_k(x,u,w_k),i)\right]\\\ \forall x\in \mathcal{S}_k,\ \forall y\in\{1,\ldots,m\},\forall k=N-1,\ldots,0\end{matrix}$}
+\end{itemize}
+
+\section{Infinite Horizon Problem}
+
+We are dealing with a linear time-invariant system:
+
+\mportant{$x_{k+1}=f(x_k,u_k,w_k),\quad x_k\in\mathcal{S},\ u_k\in\mathcal{U}(x_k),\ w_k\sim p_{w|x,u},\ k=0,\ldots,N-1$}
+
+The control inputs are generated by an admissible policy $\pi\in\Pi$:
+
+\mportant{$\pi=\left(\mu_0(\cdot),\mu_1(\cdot),\ldots,\mu_{N-1}(\cdot)\right)$}
+
+such that
+
+\mportant{$\mu_k=\mu_k(x_k),\ u_k\in\mathcal{U}(x_k),\ \forall\ \in\ \mathcal{S},\ \forall k$}
+
+The cost is a function of time-invariant stage costs:
+
+\mportant{$\sum\limits_{k=}^{N-1}g(x_k,u_k,w_k)$}
+
+The expected closed loop cost of starting at $x$ associated with policy $\pi\in\Pi$:
+
+\mportant{$J_\pi(x)=\underset{(X_1,W_0|x_0=x)}{E}\left[\sum\limits_{k=0}^{N-1}g(x_k,\mu_k(x_k),w_k)\right]$}
+
+\textbf{Objective:}
+
+\mportant{$\pi^\ast=\underset{\pi\in\Pi}{\text{arg min}}J_\pi(x)$}
+
+Analyse behaviour when $N\rightarrow\infty$:
+
+\begin{align*}
+J_N(x)&=0\quad \forall x\in\mathcal{S}\\
+J_k(x)&=\underset{u\in\mathcal{U}(x)}{\min}\underset{(w|x=x,u=u)}{E}[g(x,u,w)+J_{k+1}(f(x,u,w))],\quad \forall x\in\mathcal{S},\quad \forall k=N-1,\ldots,0
+\end{align*}
+
+By index substitution: $l:=N-k$ and $V_l(\cdot):=J_{N-l}(\cdot)$:
+
+\begin{align*}
+V_0(x)&=0\quad \forall x\in\mathcal{S}\\
+V_l(x)&=\underset{u\in\mathcal{U}(x)}{\min}\underset{(w|x=x,u=u}{E}[g(x,u,w)+V_{l-1}(f(x,u,w))],\quad\forall x\in\mathcal{S},\quad\forall l=1,\ldots,N
+\end{align*}
+
+Now assume that for each $x\in\mathcal{S}$ the sequence $V_l(x)$ approaches a certain value as $N\rightarrow\infty$:
+
+\importname{Bellman Equation (BE)}{$J(x)=\underset{u\in\mathcal{U}(x)}{\min}\underset{(w|x=x,u=u)}{E}[g(x,u,w)+V_{l-1}(f(x,u,w))],\forall x\in\mathcal{S}$}
+
+\subsection{The Stochastic Shortest Path (SSP) Problem}
+
+Consider a finite state, time-invariant system:
+
+\begin{align*}
+x_{k+1}=w_k,\quad x_k\in\mathcal{S}\\
+Pr(w_k=j|x_k=i,u_k=u)=P_{ij}(u),\quad u\in\mathcal{U}(i)
+\end{align*}
+
+The expected closed loop cost of starting at $i$ associated with policy $\pi$ becomes:
+
+\mportant{$J_\pi(i)=\underset{X_1,W_0|x_0=i)}{E}\left[\sum\limits_{k=0}^{N-1}g(x_k,\mu_k(x_k),w_k)\right]$}
+
+We \textbf{assume} that there exists a cost-free termination state, which we designate as state 0. In praticular, there are $n+1$ states with $\mathcal{S}=\{0,1,\ldots,n\}$ where
+
+\mportant{$P_{00}(u)=1$ and $g(0,u,0)=0,\quad \forall u\in\mathcal{U}(0)$}
+
+The objective is then:
+
+\mportant{$\pi^\ast=\underset{\pi\in\Pi}{\text{arg min}}J_\pi(i)$}
+
+\begin{define}
+A policy is \textbf{stationary} if it is the same for all times such that $\pi = (\mu(\cdot),\mu(\cdot),\ldots,\mu(\cdot))$ which is written just as $\mu$.
+\end{define}
+
+\begin{define}
+A stationary policy is said to be \textbf{proper} if, when using this policy there exists an integer $m$ such that
+
+\mportant{$Pr(x_m=0|x_0=i)>0$}
+
+If a policy is not proper it is said to be \textbf{improper}.
+\end{define}
+
+Further it is \textbf{assumed} that there exists at least one proper policy $\mu\in\Pi$. Furthermore, for every improper policy $\mu'$, the corresponding cost function $J_{\mu'}$ is infinity for at least one state $i\in\mathcal{S}$.
+
+Based on that it can be proven that the final state will be reached with probability 1:
+
+\begin{align*}
+Pr(x_m=0|x_0=i)&=\alpha >0\\
+Pr(x_m\neq 0|x_0=i)&=1-\alpha,\ i\in\mathcal{S}\textbackslash\{0\}\\
+Pr(x_{2m}\neq 0|x_0=i)&=Pr(x_{2m}\neq 0,x_m\neq 0|x_0=i)\\
+&=\underbrace{Pr(x_{2m}\neq 0|x_m\neq 0,x_0=i)}_{1-\alpha}\underbrace{Pr(x_m\neq 0|x_0=i)}_{1-\alpha}\\
+\Rightarrow Pr(x_{2m}=0|x_0=i)&=1-(1-\alpha)^2\\
+&\Rightarrow \lim\limits_{N\rightarrow \infty}Pr(x_N=0|x_0=1)=1
+\end{align*}
+
+\subsection{Theorem 4.1}
+
+\begin{enumerate}
+\item Given any initial conditions $V_0(1),\ldots,V_0(n)$, the sequence $V_l(i)$ generated by the iteration
+
+\mportant{$V_{l+1}(i)=\underset{u\in\mathcal{U}}{\min}\left(q(i,u)+\sum\limits_{j=1}^nP_{ij}(u)V_l(j)\right),\quad \forall i\in\mathcal{S}\textbackslash\{0\}$}
+
+where
+
+\mportant{$q(i,u):=\underset{(x|x=i,u=u)}[g(x,u,w)]$}
+
+\item The optimal costs satisfy the Bellman Equation:
+
+\mportant{$J^\ast(i)=\underset{u\in\mathcal{U}}{\min}\left(q(i,u)+\sum\limits_{j=1}^nP_{ij}(u)J^\ast(j)\right)\forall i\in\mathcal{S}\textbackslash\{0\}$}
+
+\item The solution to the BE is unique
+\item The minimizing $u$ for each $i\in\mathcal{S}\textbackslash\{0\}$ of the BE gives an optimal policy, which is proper.
+\end{enumerate}
+
+See lecture 4 for an intuition why this is true.
+
+\end{multicols*}
+
+\end{document}
